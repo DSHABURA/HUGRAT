@@ -70,6 +70,7 @@ class App(ct.CTk):
             self.content = CreateNewModelContent(master=self,fg_color="blue")
         if self.page == "new_dataset":
             self.content = NewDatasetContent(master=self, fg_color="green")
+            self.sidebar.connect_webcam(self.content)
         if self.page == "import_dataset":
             self.content = ImportDatasetContent(master=self, fg_color="yellow")
         if self.page == "begin_translation":
