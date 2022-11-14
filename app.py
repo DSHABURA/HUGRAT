@@ -16,6 +16,7 @@ class App(ct.CTk):
         self.title(App.TITLE)
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         self.resizable(App.RESIZABLE, App.RESIZABLE)
+        self.iconbitmap("favicon.ico")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         #Takes up any extra space vertically
