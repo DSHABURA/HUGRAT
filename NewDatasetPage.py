@@ -5,6 +5,7 @@ import customtkinter as ct
 import cv2
 import mediapipe as mp
 from tkinter import NW,Tk,Canvas, PhotoImage
+import copy
 
 class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
@@ -16,7 +17,6 @@ class NewDatasetSidebar(Sidebar):
 
     def connect_webcam(self,webcam):
         self.webcam = webcam
-        #self.add_slider(label="Delay",from_=0,to=3,increment=0.25)
 
 
 
@@ -34,6 +34,13 @@ class NewDatasetContent(Content):
 
         self.cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         self.c_frame = None
+        self.m_frame = None
+        
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_drawing_styles = mp.solutions.drawing_styles
+        self.mp_hands = mp.solutions.hands
+
+
         if not self.cap.isOpened():
             raise IOError("Cannot open webcam")
         self.update()
@@ -41,15 +48,34 @@ class NewDatasetContent(Content):
     def get_frame(self):
         if self.cap.isOpened():
             success, frame = self.cap.read()
+            self.c_frame = cv2.flip(copy.deepcopy(frame),1)
             if success:
-                return (success, cv2.cvtColor(cv2.flip(frame,1), cv2.COLOR_BGR2RGB))
+                with self.mp_hands.Hands(model_complexity=1,min_detection_confidence=0.7, min_tracking_confidence=0.7) as hands:
+                    frame.flags.writeable=False
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    results = hands.process(frame)
+                    frame.flags.writeable=True
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+                    if results.multi_hand_landmarks:
+                        self.m_frame = results.multi_hand_landmarks
+                        for hand_landmarks in results.multi_hand_landmarks:
+                            self.mp_drawing.draw_landmarks(
+                                        frame,
+                                        hand_landmarks,
+                                        self.mp_hands.HAND_CONNECTIONS,
+                                        self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                                        self.mp_drawing_styles.get_default_hand_connections_style())
+                            
+
+                        
+                    return (success, cv2.cvtColor(cv2.flip(frame,1), cv2.COLOR_BGR2RGB))
             else: return (success,None)
         else:
             return (success,None)
 
     def update(self):
         success, frame = self.get_frame()
-        self.c_frame = frame
         if success:
             self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
             self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
@@ -60,6 +86,7 @@ class NewDatasetContent(Content):
             self.cap.release()
     def capture(self):
         cv2.imwrite("./SavedGestures/Test/" + str(self.photo) +".png", self.c_frame)
+        print(self.m_frame)
 
 
     def close(self):
