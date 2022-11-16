@@ -85,10 +85,27 @@ class NewDatasetContent(Content):
         if self.cap.isOpened():
             self.cap.release()
     def capture(self):
-        cv2.imwrite("./SavedGestures/Test/" + str(self.photo) +".png", self.c_frame)
-        print(self.m_frame)
+        data_string = ""
+        if self.m_frame:
+            hand_count = 0
+            for hand in self.m_frame:
+                data_string +="\n"
+                data_string += "label,"
+                data_string += str(hand_count) + ","
+                print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                print(hand_count)
+                hand_count +=1
+                hand_landmarks = hand.landmark
+                for landmark in hand_landmarks:
+                    data_string += str(round(landmark.x,3)) + "," + str(round(landmark.y,3)) +","
+            #data_string +="\n"
+        #data_string += "\n"
 
+        with open('./data/training_data.csv','a') as fd: fd.write(data_string)          
 
+    def get_landmarks(self):
+        if self.m_frame:
+            return self.m_frame
     def close(self):
         self.release()
 
