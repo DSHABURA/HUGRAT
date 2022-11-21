@@ -1,112 +1,199 @@
 from Sidebar import Sidebar
 from Content import Content
-from PIL import Image, ImageTk
-import customtkinter as ct
-import cv2
+from tkinter import Canvas
+import cv2 as cv
 import mediapipe as mp
-from tkinter import NW,Tk,Canvas, PhotoImage
+from PIL import Image, ImageTk
+import itertools
 import copy
+import csv
+import os
+import customtkinter as ct
+current_label = "TESTLABEL"
+label_list = []
+current_results = []
+min_detection_confidence = 0.7
+min_tracking_confidence = 0.7
+
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(
+    min_detection_confidence=min_detection_confidence,
+    min_tracking_confidence=min_tracking_confidence,
+    max_num_hands = 1,
+    static_image_mode = False)
 
 class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "New Dataset",*args, **kwargs)
         self.add_button(text="Return",command=lambda: self.master.set_page("create_new_model"))
+        self.add_button(text="Capture",command=lambda: self.capture())
+    
+        self.label = None
+        self.label_list = []
 
-        self.add_button(text="Capture",command=lambda:self.webcam.capture())
-
-
+        self.label_field = ct.CTkEntry(self, width=20)
+        self.label_field.grid(row=3, column=0, sticky="ew")
     def connect_webcam(self,webcam):
         self.webcam = webcam
 
+    def capture(self):
+        self.set_label(self.label_field.get())
+        self.webcam.capture_data()
+    def set_label(self, label):
+        corrected_label = label.lower()
+        if corrected_label and corrected_label not in self.label_list:
+            self.label_list.append(corrected_label)
+            print(self.label_list.index(corrected_label))
 
+        with open("./data/labels.csv", "w") as f:
+            for label in self.label_list:
+                f.write( label+ "\n")
 
+        # with open('./data/labels.csv', 'r') as fr:
+        #     self.label_list = fr.read()
 
+        # if corrected_label in self.label_list:
+        #     return
+        # else:
+        #     with open('./data/labels.csv','r') as fw:
+        #         self.label_list = list(csv.reader(fw))
+        #     self.label_list.append(corrected_label)
+
+        #     print(self.label_list)
+        #     with open('./data/labels.csv', 'a') as fd:
+        #         fd.write(corrected_label + "\n")
+
+        self.label = corrected_label
+        self.webcam.label = corrected_label
+        self.webcam.label_list = self.label_list
 
 class NewDatasetContent(Content):
+    def frame_rgb_to_bgr(self,frame):
+        return cv.cvtColor(frame, cv.COLOR_RGB2BGR)
+    def frame_bgr_to_rgb(self,frame):
+        return cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+    def flip_frame(self,frame):
+        return cv.flip(frame, 1)
+    def calc_landmark_list(self,image, landmarks):
+        image_width, image_height = image.shape[1], image.shape[0]
+
+        landmark_point = []
+
+        # Keypoint
+        for _, landmark in enumerate(landmarks.landmark):
+            landmark_x = min(int(landmark.x * image_width), image_width - 1)
+            landmark_y = min(int(landmark.y * image_height), image_height - 1)
+            # landmark_z = landmark.z
+
+            landmark_point.append([landmark_x, landmark_y])
+
+        return landmark_point
+    def calc_relative_landmarks(self,landmark_list):
+        temp_landmark_list = copy.deepcopy(landmark_list)
+
+        # Convert to relative coordinates
+        base_x, base_y = 0, 0
+        for index, landmark_point in enumerate(temp_landmark_list):
+            if index == 0:
+                base_x, base_y = landmark_point[0], landmark_point[1]
+
+            temp_landmark_list[index][0] = temp_landmark_list[index][0] - base_x
+            temp_landmark_list[index][1] = temp_landmark_list[index][1] - base_y
+
+        # Convert to a one-dimensional list
+        temp_landmark_list = list(
+            itertools.chain.from_iterable(temp_landmark_list))
+
+        # Normalization
+        max_value = max(list(map(abs, temp_landmark_list)))
+
+        def normalize_(n):
+            return n / max_value
+
+        temp_landmark_list = list(map(normalize_, temp_landmark_list))
+
+        return temp_landmark_list
+    def logging_csv(self, label, relative_landmarks):
+        csv_path = 'data/training_data.csv'
+        with open(csv_path, 'a', newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([label, *relative_landmarks])
+        return
+
+    def capture_data(self):
+        if self.label:
+            self.logging_csv(self.label_list.index(self.label), self.relative_list)
+        else:
+            print("No label!!")
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self, width = 640, height = 480)
+        self.label = None
+        self.label_list = []
+        self.grid_rowconfigure(0,weight=1)
+        self.grid_columnconfigure(0,weight=1)
+
+
+        self.cap_width =900
+        self.cap_height = 700
+        self.canvas = Canvas(self, width = self.cap_width , height = self.cap_height)
         self.canvas.grid(row=0,column=0)
 
 
-        self.cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-        self.c_frame = None
-        self.m_frame = None
         
+        self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, self.cap_width)
+        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, self.cap_height)
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.mp_hands = mp.solutions.hands
+
 
 
         if not self.cap.isOpened():
             raise IOError("Cannot open webcam")
         self.update()
 
-    def get_frame(self):
-        if self.cap.isOpened():
-            success, frame = self.cap.read()
-            self.c_frame = cv2.flip(copy.deepcopy(frame),1)
-            if success:
-                with self.mp_hands.Hands(model_complexity=1,min_detection_confidence=0.7, min_tracking_confidence=0.7) as hands:
-                    frame.flags.writeable=False
-                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    results = hands.process(frame)
-                    frame.flags.writeable=True
-                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-
-                    if results.multi_hand_landmarks:
-                        self.m_frame = results.multi_hand_landmarks
-                        for hand_landmarks in results.multi_hand_landmarks:
-                            self.mp_drawing.draw_landmarks(
-                                        frame,
-                                        hand_landmarks,
-                                        self.mp_hands.HAND_CONNECTIONS,
-                                        self.mp_drawing_styles.get_default_hand_landmarks_style(),
-                                        self.mp_drawing_styles.get_default_hand_connections_style())
-                            
-
-                        
-                    return (success, cv2.cvtColor(cv2.flip(frame,1), cv2.COLOR_BGR2RGB))
-            else: return (success,None)
-        else:
-            return (success,None)
-
     def update(self):
-        success, frame = self.get_frame()
-        if success:
-            self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
-            self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
+        ret, frame = self.cap.read()
+        if ret:
+
+            #frame pre-processing
+            frame = self.frame_rgb_to_bgr(frame)
+            frame = self.flip_frame(frame)
+
+            #hand detection
+            frame = self.frame_bgr_to_rgb(frame)
+            frame.flags.writeable = False
+            results = hands.process(frame)
+            frame.flags.writeable = True
+
+            if results.multi_hand_landmarks is not None:
+                for hand_landmarks, handedness in zip(results.multi_hand_landmarks,results.multi_handedness):
+                    
+                    
+                    #Convert from 0-1 to pixel coordinates (step 1)
+                    landmark_list = self.calc_landmark_list(frame, hand_landmarks)
+                    #convert to relative coordinates (step 2) (relative to wrist, or id 0)
+                    #flattent to 1d array (step 3)
+                    #normalize (step 4)
+                    self.relative_list = self.calc_relative_landmarks(landmark_list)
+
+
+                    #if the capture button is pressed, it will call capture_frame
+
+                    self.mp_drawing.draw_landmarks(
+                            frame,
+                            hand_landmarks,
+                            mp_hands.HAND_CONNECTIONS,
+                            self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                            self.mp_drawing_styles.get_default_hand_connections_style())
+
+            
+
+
+            #final render
+            self.photo = ImageTk.PhotoImage(image = Image.fromarray(frame))
+
+            self.canvas.create_image(0, 0, image = self.photo, anchor = "nw")
         self.after(15, self.update)
-
-    def release(self):
-        if self.cap.isOpened():
-            self.cap.release()
-    def capture(self):
-        data_string = ""
-        if self.m_frame:
-            hand_count = 0
-            for hand in self.m_frame:
-                data_string +="\n"
-                data_string += "label,"
-                data_string += str(hand_count) + ","
-                print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                print(hand_count)
-                hand_count +=1
-                hand_landmarks = hand.landmark
-                for landmark in hand_landmarks:
-                    data_string += str(round(landmark.x,3)) + "," + str(round(landmark.y,3)) +","
-            #data_string +="\n"
-        #data_string += "\n"
-
-        with open('./data/training_data.csv','a') as fd: fd.write(data_string)          
-
-    def get_landmarks(self):
-        if self.m_frame:
-            return self.m_frame
-    def close(self):
-        self.release()
-
-
