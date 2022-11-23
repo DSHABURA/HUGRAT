@@ -6,6 +6,7 @@ from CreateNewModelPage import CreateNewModelSidebar, CreateNewModelContent
 from NewDatasetPage import NewDatasetSidebar, NewDatasetContent
 from ImportDatasetPage import ImportDatasetSidebar, ImportDatasetContent
 from BeginTranslationPage import BeginTranslationSidebar, BeginTranslationContent
+from BeginTrainingPage import BeginTrainingSidebar, BeginTrainingContent
 class App(ct.CTk):
     WIDTH = 780
     HEIGHT = 520
@@ -64,6 +65,9 @@ class App(ct.CTk):
             self.sidebar = ImportDatasetSidebar(master=self)
         if self.page == "begin_translation":
             self.sidebar = BeginTranslationSidebar(master=self)
+
+        if self.page == "begin_training":
+            self.sidebar = BeginTrainingSidebar(master=self)
     def create_content(self):            
         if self.page == "home":
             self.content = HomeContent(master=self, fg_color="red")
@@ -76,6 +80,8 @@ class App(ct.CTk):
             self.content = ImportDatasetContent(master=self, fg_color="yellow")
         if self.page == "begin_translation":
             self.content = BeginTranslationContent(master=self, fg_color="cyan")
+        if self.page == "begin_training":
+            self.content = BeginTrainingContent(master=self, fg_color="magenta")
         
 
 

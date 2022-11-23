@@ -26,7 +26,9 @@ class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "New Dataset",*args, **kwargs)
         self.add_button(text="Return",command=lambda: self.master.set_page("create_new_model"))
+        self.add_button(text="Finish",command = lambda: self.master.set_page("begin_training"))
         self.add_button(text="Capture",command=lambda: self.capture())
+        
     
         self.label = None
         self.label_list = []
@@ -39,6 +41,7 @@ class NewDatasetSidebar(Sidebar):
     def capture(self):
         self.set_label(self.label_field.get())
         self.webcam.capture_data()
+    
     def set_label(self, label):
         corrected_label = label.lower()
         if corrected_label and corrected_label not in self.label_list:
@@ -48,20 +51,6 @@ class NewDatasetSidebar(Sidebar):
         with open("./data/labels.csv", "w") as f:
             for label in self.label_list:
                 f.write( label+ "\n")
-
-        # with open('./data/labels.csv', 'r') as fr:
-        #     self.label_list = fr.read()
-
-        # if corrected_label in self.label_list:
-        #     return
-        # else:
-        #     with open('./data/labels.csv','r') as fw:
-        #         self.label_list = list(csv.reader(fw))
-        #     self.label_list.append(corrected_label)
-
-        #     print(self.label_list)
-        #     with open('./data/labels.csv', 'a') as fd:
-        #         fd.write(corrected_label + "\n")
 
         self.label = corrected_label
         self.webcam.label = corrected_label
@@ -119,12 +108,12 @@ class NewDatasetContent(Content):
             writer = csv.writer(f)
             writer.writerow([label, *relative_landmarks])
         return
-
     def capture_data(self):
         if self.label:
             self.logging_csv(self.label_list.index(self.label), self.relative_list)
         else:
             print("No label!!")
+   
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
 

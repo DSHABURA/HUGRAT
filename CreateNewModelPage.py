@@ -7,7 +7,7 @@ class CreateNewModelSidebar(Sidebar):
 
         self.add_button(text="Return",command=lambda: self.master.set_page("home"))
         self.add_button(text="New Dataset",command=lambda: self.master.set_page("new_dataset"))
-        self.add_button(text="Import Dataset", command=lambda: self.master.set_page("import_dataset"))
+        #self.add_button(text="Import Dataset", command=lambda: self.master.set_page("import_dataset"))
 
         
 
