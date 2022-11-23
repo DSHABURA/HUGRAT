@@ -14,6 +14,7 @@ def start_training():
     dataset = './data/training_data.csv'
     labelset = './data/labels.csv'
     model_save_path = './data/classifier.hdf5'
+    tflite_save_path = './data/classifier.tflite'
     NUM_CLASSES = sum(1 for row in csv.reader(open(labelset)))
     print(NUM_CLASSES)
 
@@ -58,6 +59,26 @@ def start_training():
     val_loss, val_acc = model.evaluate(X_test, y_test, batch_size=128)
 
 
+    # Loading the saved model
+    model = tf.keras.models.load_model(model_save_path)
+
+    # Inference test
+    predict_result = model.predict(np.array([X_test[0]]))
+    print(np.squeeze(predict_result))
+    print(np.argmax(np.squeeze(predict_result)))
+
+
+    # Save as a model dedicated to inference
+    model.save(model_save_path, include_optimizer=False)
+
+
+    # Transform model (quantization)
+
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    tflite_quantized_model = converter.convert()
+
+    open(tflite_save_path, 'wb').write(tflite_quantized_model)
 
 
 class BeginTrainingSidebar(Sidebar):
