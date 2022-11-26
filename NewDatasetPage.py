@@ -27,7 +27,7 @@ class NewDatasetSidebar(Sidebar):
         super().__init__(heading = "New Dataset",*args, **kwargs)
         self.add_button(text="Return",command=lambda: self.master.set_page("create_new_model"))
         self.add_button(text="Finish",command = lambda: self.master.set_page("begin_training"))
-        self.add_button(text="Capture",command=lambda: self.capture())
+        #self.add_button(text="Capture",command=lambda: self.capture())
         
     
         self.label = None
@@ -35,6 +35,10 @@ class NewDatasetSidebar(Sidebar):
 
         self.label_field = ct.CTkEntry(self, width=20)
         self.label_field.grid(row=3, column=0, sticky="ew")
+
+
+        self.capture_button = ct.CTkButton(self,text="Capture", command=lambda: self.capture())
+        self.capture_button.grid(row=4,column=0,sticky="ew")
     def connect_webcam(self,webcam):
         self.webcam = webcam
 
@@ -122,6 +126,14 @@ class NewDatasetContent(Content):
         self.grid_rowconfigure(0,weight=1)
         self.grid_columnconfigure(0,weight=1)
 
+
+        #clear training data
+        with open("./data/training_data.csv", "w") as f:
+            f.write("")
+        #clear labels
+        with open("./data/labels.csv", "w") as f:
+            f.write("")
+            
 
         self.cap_width =900
         self.cap_height = 700

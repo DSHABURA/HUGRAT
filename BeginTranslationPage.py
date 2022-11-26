@@ -71,7 +71,15 @@ class BeginTranslationSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "Begin Translation",*args, **kwargs)
 
-        self.add_button(text="Return",command=lambda: self.master.set_page("home"))
+        self.add_button(text="Return",command=lambda: self.back())
+
+    def connect_webcam(self,webcam):
+        self.webcam = webcam
+
+    def back(self):
+        if self.webcam.cap:
+            self.webcam.cap.release()
+        self.master.set_page("home")
 
 
 class BeginTranslationContent(Content):
@@ -82,10 +90,14 @@ class BeginTranslationContent(Content):
             
 
             self.label_list = []
+            self.keypoint_classifier_labels = []
 
-            with open('./data/labels.csv', 'r') as f:
-                reader = csv.reader(f)
-                self.label_list= [row for row in reader]
+        # Read labels ###########################################################
+            with open('./data/labels.csv',encoding='utf-8-sig') as f:
+                self.keypoint_classifier_labels = csv.reader(f)
+                self.keypoint_classifier_labels = [
+                    row[0] for row in self.keypoint_classifier_labels
+                ]
 
             print(self.label_list)
 
@@ -142,6 +154,8 @@ class BeginTranslationContent(Content):
                             self.mp_drawing_styles.get_default_hand_landmarks_style(),
                             self.mp_drawing_styles.get_default_hand_connections_style())
 
+                    frame = draw_info_text(frame,brect,handedness,self.keypoint_classifier_labels[hand_sign_id])
+
             
 
             frame = frame_rgb_to_bgr(frame)
@@ -150,3 +164,17 @@ class BeginTranslationContent(Content):
 
             self.canvas.create_image(0, 0, image = self.photo, anchor = "nw")
         self.after(15, self.update)
+
+
+def draw_info_text(image, brect, handedness, hand_sign_text):
+    cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[1] - 22),
+                 (0, 0, 0), -1)
+
+    info_text = handedness.classification[0].label[0:]
+    if hand_sign_text != "":
+        info_text = info_text + ':' + hand_sign_text
+    cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),
+               cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv.LINE_AA)
+
+
+    return image

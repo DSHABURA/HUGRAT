@@ -80,6 +80,7 @@ class App(ct.CTk):
             self.content = ImportDatasetContent(master=self, fg_color="yellow")
         if self.page == "begin_translation":
             self.content = BeginTranslationContent(master=self, fg_color="cyan")
+            self.sidebar.connect_webcam(self.content)
         if self.page == "begin_training":
             self.content = BeginTrainingContent(master=self, fg_color="magenta")
         
