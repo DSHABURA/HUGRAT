@@ -4,14 +4,13 @@ from tkinter import Canvas
 import cv2 as cv
 import mediapipe as mp
 from PIL import Image, ImageTk
-import itertools
-import copy
 import csv
 import os
 import customtkinter as ct
 import utils
 import tensorflow as tf
 import numpy as np
+from tkinter import filedialog as fd
 
 
 min_detection_confidence = 0.7
@@ -51,7 +50,7 @@ class KeyPointClassifier(object):
 
 
 
-keypoint_classifier = KeyPointClassifier()
+
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
@@ -72,6 +71,7 @@ class BeginTranslationSidebar(Sidebar):
         super().__init__(heading = "Begin Translation",*args, **kwargs)
 
         self.add_button(text="Return",command=lambda: self.back())
+        
 
     def connect_webcam(self,webcam):
         self.webcam = webcam
@@ -87,6 +87,12 @@ class BeginTranslationContent(Content):
             super().__init__(*args, **kwargs)
             self.grid_rowconfigure(0,weight=1)
             self.grid_columnconfigure(0,weight=1)
+
+            #fd.askopenfilename(initialdir="./data/", title="Select model file", filetypes=((".tflite", "*.tflite"), ("all files", "*.*")))
+
+
+
+            self.keypoint_classifier = KeyPointClassifier()
             
 
             self.label_list = []
@@ -143,7 +149,7 @@ class BeginTranslationContent(Content):
                         
 
                     # Hand sign classification
-                    hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
+                    hand_sign_id = self.keypoint_classifier(pre_processed_landmark_list)
                     print(hand_sign_id)
 
 

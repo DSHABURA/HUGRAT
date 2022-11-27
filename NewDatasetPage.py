@@ -26,7 +26,7 @@ class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "New Dataset",*args, **kwargs)
         self.add_button(text="Return",command=lambda: self.master.set_page("create_new_model"))
-        self.add_button(text="Finish",command = lambda: self.master.set_page("begin_training"))
+        self.add_button(text="Finish",command = lambda: self.begin_training())
         #self.add_button(text="Capture",command=lambda: self.capture())
         
     
@@ -39,6 +39,11 @@ class NewDatasetSidebar(Sidebar):
 
         self.capture_button = ct.CTkButton(self,text="Capture", command=lambda: self.capture())
         self.capture_button.grid(row=4,column=0,sticky="ew")
+
+    def begin_training(self):
+        if self.webcam.cap:
+            self.webcam.cap.release()
+        self.master.set_page("begin_training")
     def connect_webcam(self,webcam):
         self.webcam = webcam
 

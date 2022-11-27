@@ -5,6 +5,9 @@ import csv
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+from tkinter import filedialog
+import os
+import shutil
 
 
 
@@ -78,7 +81,18 @@ def start_training():
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     tflite_quantized_model = converter.convert()
 
+
+    f = filedialog.asksaveasfile(initialfile="untitled.tflite", initialdir="./data/", defaultextension=".tflite", filetypes=[("TFLite", "*.tflite")])
+    
+    print("============")
+    print(f.name)
+    print(os.path.splitext(f.name)[0])
+    shutil.copy("./data/labels.csv", os.path.dirname(os.path.abspath(f.name)) + "/labels.csv")
+    shutil.copy("./data/training_data.csv", os.path.dirname(os.path.abspath(f.name)) + "/training_data.csv")
+    #shutil.copyfile("./data/labels.csv", )
+    print("=============")
     open(tflite_save_path, 'wb').write(tflite_quantized_model)
+
 
 
 class BeginTrainingSidebar(Sidebar):
