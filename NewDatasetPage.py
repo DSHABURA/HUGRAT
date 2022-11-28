@@ -9,6 +9,10 @@ import copy
 import csv
 import os
 import customtkinter as ct
+import random
+
+
+
 current_label = "TESTLABEL"
 label_list = []
 current_results = []
@@ -55,7 +59,7 @@ class NewDatasetSidebar(Sidebar):
         corrected_label = label.lower()
         if corrected_label and corrected_label not in self.label_list:
             self.label_list.append(corrected_label)
-            print(self.label_list.index(corrected_label))
+            #print(self.label_list.index(corrected_label))
 
         with open("./data/labels.csv", "w") as f:
             for label in self.label_list:
@@ -111,11 +115,33 @@ class NewDatasetContent(Content):
         temp_landmark_list = list(map(normalize_, temp_landmark_list))
 
         return temp_landmark_list
+
+
+
+
+
+    def add_noise_items(self, landmark_list):
+        #add noise:
+        noise_landmark_list = copy.deepcopy(landmark_list)
+        random.seed(0)
+        for i in range(2, len(noise_landmark_list)):
+            noise = random.uniform(-0.05, 0.05)
+            noise_landmark_list[i] += noise
+
+        return noise_landmark_list
+
     def logging_csv(self, label, relative_landmarks):
         csv_path = 'data/training_data.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([label, *relative_landmarks])
+            writer.writerow(([label, *relative_landmarks]))
+            #print(relative_landmarks)
+            for i in range(1):
+                noise_landmark_list = self.add_noise_items(relative_landmarks)
+                writer.writerow(([label, *noise_landmark_list]))
+
+            #writer = csv.writer(f)
+            #writer.writerow([label, *relative_landmarks])
         return
     def capture_data(self):
         if self.label:

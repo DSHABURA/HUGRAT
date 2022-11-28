@@ -19,7 +19,6 @@ def start_training():
     model_save_path = './data/classifier.hdf5'
     tflite_save_path = './data/classifier.tflite'
     NUM_CLASSES = sum(1 for row in csv.reader(open(labelset)))
-    print(NUM_CLASSES)
 
     #dataset reading
     X_dataset = np.loadtxt(dataset, delimiter=',', dtype='float32', usecols=list(range(1, (21 * 2) + 1)))
@@ -67,8 +66,8 @@ def start_training():
 
     # Inference test
     predict_result = model.predict(np.array([X_test[0]]))
-    print(np.squeeze(predict_result))
-    print(np.argmax(np.squeeze(predict_result)))
+    #print(np.squeeze(predict_result))
+    #print(np.argmax(np.squeeze(predict_result)))
 
 
     # Save as a model dedicated to inference
@@ -91,7 +90,9 @@ def start_training():
     shutil.copy("./data/training_data.csv", os.path.dirname(os.path.abspath(f.name)) + "/training_data.csv")
     #shutil.copyfile("./data/labels.csv", )
     print("=============")
+    tflite_save_path = f.name
     open(tflite_save_path, 'wb').write(tflite_quantized_model)
+    
 
 
 

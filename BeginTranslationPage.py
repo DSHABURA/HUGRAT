@@ -88,24 +88,23 @@ class BeginTranslationContent(Content):
             self.grid_rowconfigure(0,weight=1)
             self.grid_columnconfigure(0,weight=1)
 
-            #fd.askopenfilename(initialdir="./data/", title="Select model file", filetypes=((".tflite", "*.tflite"), ("all files", "*.*")))
+            f = fd.askopenfilename(initialdir="./data/", title="Select model file", filetypes=((".tflite", "*.tflite"), ("all files", "*.*")))
 
 
 
-            self.keypoint_classifier = KeyPointClassifier()
+            self.keypoint_classifier = KeyPointClassifier(model_path=f)
             
 
             self.label_list = []
             self.keypoint_classifier_labels = []
 
         # Read labels ###########################################################
-            with open('./data/labels.csv',encoding='utf-8-sig') as f:
+            with open(os.path.dirname(os.path.abspath(f)) + "/labels.csv",encoding='utf-8-sig') as f:
                 self.keypoint_classifier_labels = csv.reader(f)
                 self.keypoint_classifier_labels = [
                     row[0] for row in self.keypoint_classifier_labels
                 ]
 
-            print(self.label_list)
 
             self.cap_width =900
             self.cap_height = 700
@@ -150,7 +149,6 @@ class BeginTranslationContent(Content):
 
                     # Hand sign classification
                     hand_sign_id = self.keypoint_classifier(pre_processed_landmark_list)
-                    print(hand_sign_id)
 
 
                     self.mp_drawing.draw_landmarks(
