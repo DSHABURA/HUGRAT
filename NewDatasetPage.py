@@ -29,10 +29,8 @@ hands = mp_hands.Hands(
 class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "New Dataset",*args, **kwargs)
-        self.add_button(text="Return",command=lambda: self.master.set_page("create_new_model"))
+        self.add_button(text="Return",command=lambda: self.go_back())
         self.add_button(text="Finish",command = lambda: self.begin_training())
-        #self.add_button(text="Capture",command=lambda: self.capture())
-        
     
         self.label = None
         self.label_list = []
@@ -43,6 +41,11 @@ class NewDatasetSidebar(Sidebar):
 
         self.capture_button = ct.CTkButton(self,text="Capture", command=lambda: self.capture())
         self.capture_button.grid(row=4,column=0,sticky="ew")
+
+    def go_back(self):
+        if self.webcam.cap:
+            self.webcam.cap.release()
+        self.master.set_page("home")
 
     def begin_training(self):
         if self.webcam.cap:
@@ -135,13 +138,12 @@ class NewDatasetContent(Content):
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow(([label, *relative_landmarks]))
-            #print(relative_landmarks)
-            for i in range(1):
+
+
+            for i in range(4):
                 noise_landmark_list = self.add_noise_items(relative_landmarks)
                 writer.writerow(([label, *noise_landmark_list]))
 
-            #writer = csv.writer(f)
-            #writer.writerow([label, *relative_landmarks])
         return
     def capture_data(self):
         if self.label:
@@ -223,7 +225,7 @@ class NewDatasetContent(Content):
 
             
 
-
+            frame = self.frame_rgb_to_bgr(frame)
             #final render
             self.photo = ImageTk.PhotoImage(image = Image.fromarray(frame))
 

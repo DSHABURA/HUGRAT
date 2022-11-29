@@ -1,6 +1,6 @@
 from Sidebar import Sidebar
 from Content import Content
-
+import customtkinter as ct
 import csv
 import numpy as np
 import tensorflow as tf
@@ -107,6 +107,24 @@ class BeginTrainingSidebar(Sidebar):
 class BeginTrainingContent(Content):
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.grid_columnconfigure(0, weight=1)
+
+
+        self.wait_label = ct.CTkLabel(self, text="Click 'Start Training' to begin training a new model. This may take a while.")
+        self.wait_label.grid(row=0, column=0, sticky="nsew")
+
+        self.wait_label2 = ct.CTkLabel(self, text="Once training is complete, you will be prompted to save the model.")
+        self.wait_label2.grid(row=1, column=0, sticky="nsew")
+
+        self.wait_label3 = ct.CTkLabel(self, text="You must save the model in a new folder.")
+        self.wait_label3.grid(row=2,column=0, sticky="nsew")
+
+        self.wait_label4 = ct.CTkLabel(self, text="While training, the program may appear to be frozen. This is normal.")
+        self.wait_label4.grid(row=3,column=0, sticky="nsew")
+
+
+
 
 
 

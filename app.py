@@ -70,19 +70,19 @@ class App(ct.CTk):
             self.sidebar = BeginTrainingSidebar(master=self)
     def create_content(self):            
         if self.page == "home":
-            self.content = HomeContent(master=self, fg_color="red")
+            self.content = HomeContent(master=self)
         if self.page == "create_new_model":
-            self.content = CreateNewModelContent(master=self,fg_color="blue")
+            self.content = CreateNewModelContent(master=self)
         if self.page == "new_dataset":
-            self.content = NewDatasetContent(master=self, fg_color="green")
+            self.content = NewDatasetContent(master=self)
             self.sidebar.connect_webcam(self.content)
         #if self.page == "import_dataset":
         #    self.content = ImportDatasetContent(master=self, fg_color="yellow")
         if self.page == "begin_translation":
-            self.content = BeginTranslationContent(master=self, fg_color="cyan")
+            self.content = BeginTranslationContent(master=self)
             self.sidebar.connect_webcam(self.content)
         if self.page == "begin_training":
-            self.content = BeginTrainingContent(master=self, fg_color="magenta")
+            self.content = BeginTrainingContent(master=self)
         
 
 
