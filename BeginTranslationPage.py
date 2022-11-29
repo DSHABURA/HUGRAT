@@ -77,9 +77,12 @@ class BeginTranslationSidebar(Sidebar):
         self.webcam = webcam
 
     def back(self):
-        if self.webcam.cap:
-            self.webcam.cap.release()
-        self.master.set_page("home")
+        try:
+            if self.webcam.cap:
+                self.webcam.cap.release()
+            self.master.set_page("home")
+        except:
+            self.master.set_page("home")
 
 
 class BeginTranslationContent(Content):

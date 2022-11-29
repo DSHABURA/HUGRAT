@@ -61,8 +61,8 @@ class App(ct.CTk):
             self.sidebar = CreateNewModelSidebar(master=self)
         if self.page == "new_dataset":
             self.sidebar = NewDatasetSidebar(master=self)
-        if self.page == "import_dataset":
-            self.sidebar = ImportDatasetSidebar(master=self)
+        #if self.page == "import_dataset":
+        #    self.sidebar = ImportDatasetSidebar(master=self)
         if self.page == "begin_translation":
             self.sidebar = BeginTranslationSidebar(master=self)
 
@@ -76,8 +76,8 @@ class App(ct.CTk):
         if self.page == "new_dataset":
             self.content = NewDatasetContent(master=self, fg_color="green")
             self.sidebar.connect_webcam(self.content)
-        if self.page == "import_dataset":
-            self.content = ImportDatasetContent(master=self, fg_color="yellow")
+        #if self.page == "import_dataset":
+        #    self.content = ImportDatasetContent(master=self, fg_color="yellow")
         if self.page == "begin_translation":
             self.content = BeginTranslationContent(master=self, fg_color="cyan")
             self.sidebar.connect_webcam(self.content)
