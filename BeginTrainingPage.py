@@ -11,13 +11,16 @@ import shutil
 
 
 
-def start_training():
+def start_training(name):
     RANDOM_SEED = 42
+
+    dir = './data/' + name
+    print(dir)
 
     dataset = './data/training_data.csv'
     labelset = './data/labels.csv'
-    model_save_path = './data/classifier.hdf5'
-    tflite_save_path = './data/classifier.tflite'
+    model_save_path = dir + '/classifier.hdf5'
+    tflite_save_path = dir + '/classifier.tflite'
     NUM_CLASSES = sum(1 for row in csv.reader(open(labelset)))
 
     #dataset reading
@@ -81,13 +84,13 @@ def start_training():
     tflite_quantized_model = converter.convert()
 
 
-    f = filedialog.asksaveasfile(initialfile="untitled.tflite", initialdir="./data/", defaultextension=".tflite", filetypes=[("TFLite", "*.tflite")])
+    f = filedialog.asksaveasfile(initialfile=name + '.tflite', initialdir=dir, defaultextension=".tflite", filetypes=[("TFLite", "*.tflite")])
     
     print("============")
-    print(f.name)
-    print(os.path.splitext(f.name)[0])
-    shutil.copy("./data/labels.csv", os.path.dirname(os.path.abspath(f.name)) + "/labels.csv")
-    shutil.copy("./data/training_data.csv", os.path.dirname(os.path.abspath(f.name)) + "/training_data.csv")
+    #print(f.name)
+    #print(os.path.splitext(f.name)[0])
+    shutil.copy("./data/labels.csv", dir + "/labels.csv")
+    shutil.copy("./data/training_data.csv", dir + "/training_data.csv")
     #shutil.copyfile("./data/labels.csv", )
     print("=============")
     tflite_save_path = f.name
@@ -101,7 +104,32 @@ class BeginTrainingSidebar(Sidebar):
         super().__init__(heading = "Train New Model",*args, **kwargs)
 
         self.add_button(text="Cancel",command=lambda: self.master.set_page("home"))
-        self.add_button(text="Start Training",command=lambda: start_training())
+
+        self.name_label = ct.CTkLabel(self, text="Model Name:")
+        self.name_label.grid(row=2, column=0, sticky="ew")
+        self.label_field = ct.CTkEntry(self, width=20)
+        self.label_field.grid(row=3, column=0, sticky="ew")
+
+
+        self.start_training_button = ct.CTkButton(self,text="Start Training", command=lambda: self.nameCheck())
+        self.start_training_button.grid(row=4,column=0,sticky="ew")
+        self.error_label = ct.CTkLabel(self, text=":")
+        self.error_label.grid(row=5, column=0, sticky="ew")
+        #self.add_button(text="Start Training",command=lambda: start_training())
+    def nameCheck(self):
+        name=self.label_field.get()
+        dir = './data/' + name
+        self.error_label.configure(text = '')
+        if(name == ""):
+            self.name_label.configure(text_color = 'Red')
+            self.error_label.configure(text = 'Must have a model name')
+        else: 
+            if(os.path.exists(dir)):
+                self.error_label.configure(text = 'Model name already exists')
+            else:
+                start_training(name = name)
+
+
         
 
 class BeginTrainingContent(Content):
