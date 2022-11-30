@@ -70,7 +70,7 @@ class BeginTranslationSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "Begin Translation",*args, **kwargs)
 
-        self.add_button(text="Return",command=lambda: self.back())
+        self.add_button(text="Home",command=lambda: self.back())
         
 
     def connect_webcam(self,webcam):

@@ -69,8 +69,7 @@ def start_training(name):
 
     # Inference test
     predict_result = model.predict(np.array([X_test[0]]))
-    #print(np.squeeze(predict_result))
-    #print(np.argmax(np.squeeze(predict_result)))
+
 
 
     # Save as a model dedicated to inference
@@ -86,12 +85,10 @@ def start_training(name):
 
     f = filedialog.asksaveasfile(initialfile=name + '.tflite', initialdir=dir, defaultextension=".tflite", filetypes=[("TFLite", "*.tflite")])
     
-    print("============")
-    #print(f.name)
-    #print(os.path.splitext(f.name)[0])
+
     shutil.copy("./data/labels.csv", dir + "/labels.csv")
     shutil.copy("./data/training_data.csv", dir + "/training_data.csv")
-    #shutil.copyfile("./data/labels.csv", )
+
     print("=============")
     tflite_save_path = f.name
     open(tflite_save_path, 'wb').write(tflite_quantized_model)
@@ -103,7 +100,7 @@ class BeginTrainingSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "Train New Model",*args, **kwargs)
 
-        self.add_button(text="Cancel",command=lambda: self.master.set_page("home"))
+        self.add_button(text="Home",command=lambda: self.master.set_page("home"))
 
         self.name_label = ct.CTkLabel(self, text="Model Name:")
         self.name_label.grid(row=2, column=0, sticky="ew")

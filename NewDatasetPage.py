@@ -29,7 +29,7 @@ hands = mp_hands.Hands(
 class NewDatasetSidebar(Sidebar):
     def __init__(self, *args,  **kwargs):
         super().__init__(heading = "New Dataset",*args, **kwargs)
-        self.add_button(text="Return",command=lambda: self.go_back())
+        self.add_button(text="Home",command=lambda: self.go_back())
         self.add_button(text="Finish",command = lambda: self.begin_training())
     
         self.label = None
