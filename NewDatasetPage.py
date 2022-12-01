@@ -39,8 +39,16 @@ class NewDatasetSidebar(Sidebar):
         self.label_field.grid(row=3, column=0, sticky="ew")
 
 
-        self.capture_button = ct.CTkButton(self,text="Capture", command=lambda: self.capture())
+        self.error_label = ct.CTkLabel(self, text="", text_color= 'red')
+        self.error_label.grid(row=6, column=0, sticky="ew")
+
+        self.info_label = ct.CTkLabel(self, text="F1 to capture")
+        self.info_label.grid(row=5, column=0, sticky="ew")
+
+        self.capture_button = ct.CTkButton(self,text="Capture", command=lambda: self.capture(self.error_label))
         self.capture_button.grid(row=4,column=0,sticky="ew")
+        self.master.bind('<F1>', lambda event: self.capture(self.error_label))
+
 
     def go_back(self):
         if self.webcam.cap:
@@ -54,9 +62,9 @@ class NewDatasetSidebar(Sidebar):
     def connect_webcam(self,webcam):
         self.webcam = webcam
 
-    def capture(self):
+    def capture(self, label):
         self.set_label(self.label_field.get())
-        self.webcam.capture_data()
+        self.webcam.capture_data(label)
     
     def set_label(self, label):
         corrected_label = label.lower()
@@ -126,7 +134,7 @@ class NewDatasetContent(Content):
     def add_noise_items(self, landmark_list):
         #add noise:
         noise_landmark_list = copy.deepcopy(landmark_list)
-        random.seed(0)
+        random.seed()
         for i in range(2, len(noise_landmark_list)):
             noise = random.uniform(-0.05, 0.05)
             noise_landmark_list[i] += noise
@@ -145,11 +153,12 @@ class NewDatasetContent(Content):
                 writer.writerow(([label, *noise_landmark_list]))
 
         return
-    def capture_data(self):
+    def capture_data(self, label):
         if self.label:
             self.logging_csv(self.label_list.index(self.label), self.relative_list)
         else:
-            print("No label!!")
+
+            label.configure(text='Name required for capture')
    
     def __init__(self, *args,  **kwargs):
         super().__init__(*args, **kwargs)
