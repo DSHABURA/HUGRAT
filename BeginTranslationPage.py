@@ -106,15 +106,9 @@ class BeginTranslationContent(Content):
 
         self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
 
-        self.cap_width = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)
-        self.cap_height = self.cap.get(
-            cv.CAP_PROP_FRAME_HEIGHT)
-        self.canvas = Canvas(self, width=self.cap_width,
-                             height=self.cap_height)
-        self.canvas.grid(row=0, column=0)
+        self.canvas = Canvas(self)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
 
-        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, self.cap_width)
-        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, self.cap_height)
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.mp_hands = mp.solutions.hands
@@ -159,6 +153,7 @@ class BeginTranslationContent(Content):
 
             frame = frame_rgb_to_bgr(frame)
             # final render
+            frame = cv.resize(frame, (self.canvas.winfo_width(), self.canvas.winfo_height()))
             self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
 
             self.canvas.create_image(0, 0, image=self.photo, anchor="nw")
