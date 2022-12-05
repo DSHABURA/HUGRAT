@@ -4,7 +4,6 @@ import customtkinter as ct
 from HomePage import HomeSidebar, HomeContent
 from CreateNewModelPage import CreateNewModelSidebar, CreateNewModelContent
 from NewDatasetPage import NewDatasetSidebar, NewDatasetContent
-from ImportDatasetPage import ImportDatasetSidebar, ImportDatasetContent
 from BeginTranslationPage import BeginTranslationSidebar, BeginTranslationContent
 from BeginTrainingPage import BeginTrainingSidebar, BeginTrainingContent
 class App(ct.CTk):
@@ -61,8 +60,10 @@ class App(ct.CTk):
             self.sidebar = CreateNewModelSidebar(master=self)
         if self.page == "new_dataset":
             self.sidebar = NewDatasetSidebar(master=self)
+            
         #if self.page == "import_dataset":
         #    self.sidebar = ImportDatasetSidebar(master=self)
+
         if self.page == "begin_translation":
             self.sidebar = BeginTranslationSidebar(master=self)
 
@@ -76,8 +77,10 @@ class App(ct.CTk):
         if self.page == "new_dataset":
             self.content = NewDatasetContent(master=self)
             self.sidebar.connect_webcam(self.content)
+
         #if self.page == "import_dataset":
         #    self.content = ImportDatasetContent(master=self, fg_color="yellow")
+
         if self.page == "begin_translation":
             self.content = BeginTranslationContent(master=self)
             self.sidebar.connect_webcam(self.content)

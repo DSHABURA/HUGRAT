@@ -8,10 +8,49 @@ from sklearn.model_selection import train_test_split
 from tkinter import filedialog
 import os
 import shutil
+from tensorflow import keras
 
 
+#class CustomCallback(keras.callbacks.Callback):
+    #def __init__(self):
+     #   self.label = ct.CTkLabel(self, text="CUSTOMCALLBACK")
+      #  self.label.grid(row=0,column=0,sticky="ew")
+    #def on_epoch_end(self, epoch, logs=None):
+     #   label = self.model.history.history['loss'][-1]
+      #  label.update()
 
-def start_training(name):
+class CustomCallback(keras.callbacks.Callback):
+    def __init__(self, label):
+        self.label = label
+        self.label.grid(row=6,column=0,sticky="ew")
+        self.label.update()
+
+        self.label_string = "Training..."
+        self.label_string_suff = "."
+
+    def on_train_begin(self, logs=None):
+        self.label.configure(text='Training...', text_color="green")
+
+    def on_epoch_begin(self,epoch,logs=None):
+        if epoch%3 ==0:
+            self.label_string_suff += "."
+        if epoch %3 == 1:
+            self.label_string_suff = ".."
+        if epoch %3 == 2:
+            self.label_string_suff = "..."
+        self.label_string = "Training" + self.label_string_suff
+        self.label.configure(text=self.label_string, text_color="green")
+        self.label.update()
+
+    def on_train_end(self, logs=None):
+        self.label_string = "Training Complete!"
+        self.label.configure(text=self.label_string, text_color="green")
+        self.label.update()
+    #def on_epoch_end(self, epoch, logs=None):
+     #   self.label.configure(text=epoch)
+      #  self.label.update()
+
+def start_training(name,training_label):
     RANDOM_SEED = 42
 
     dir = './data/' + name
@@ -58,7 +97,7 @@ def start_training(name):
     epochs=1000,
     batch_size=128,
     validation_data=(X_test, y_test),
-    callbacks=[cp_callback, es_callback]
+    callbacks=[cp_callback, es_callback, CustomCallback(training_label)]
     )
     # Model evaluation
     val_loss, val_acc = model.evaluate(X_test, y_test, batch_size=128)
@@ -113,6 +152,7 @@ class BeginTrainingSidebar(Sidebar):
         self.error_label = ct.CTkLabel(self, text=":")
         self.error_label.grid(row=5, column=0, sticky="ew")
         #self.add_button(text="Start Training",command=lambda: start_training())
+    
     def nameCheck(self):
         name=self.label_field.get()
         dir = './data/' + name
@@ -124,7 +164,7 @@ class BeginTrainingSidebar(Sidebar):
             if(os.path.exists(dir)):
                 self.error_label.configure(text = 'Model name already exists')
             else:
-                start_training(name = name)
+                start_training(name = name, training_label = ct.CTkLabel(self.master.content,text="Training"))
 
 
         
