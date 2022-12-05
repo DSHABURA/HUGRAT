@@ -161,13 +161,21 @@ class BeginTranslationContent(Content):
 
 
 def draw_info_text(image, brect, handedness, hand_sign_text):
-    cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[1] - 22),
-                 (0, 0, 0), -1)
+    #cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[1] - 22),
+     #            (0, 0, 0), -1)
 
     info_text = handedness.classification[0].label[0:]
     if hand_sign_text != "":
         info_text = info_text + ':' + hand_sign_text
-    cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),
-               cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv.LINE_AA)
+    #cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),
+     #          cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv.LINE_AA)
 
+    h,w,c = image.shape
+    offset = int(h/20)
+    font = cv.FONT_HERSHEY_SIMPLEX
+    cv.rectangle(image, (0,0),(w,offset),(0,0,0),-1)
+    cv.putText(image, info_text, (20,offset-5), font, 0.6, (255,255,255),1,cv.LINE_AA)
+    
+    #cv.putText(image, info_text, (int(image.shape[1]/2),15),cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv.LINE_AA)
     return image
+ 
