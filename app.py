@@ -6,37 +6,38 @@ from CreateNewModelPage import CreateNewModelSidebar, CreateNewModelContent
 from NewDatasetPage import NewDatasetSidebar, NewDatasetContent
 from BeginTranslationPage import BeginTranslationSidebar, BeginTranslationContent
 from BeginTrainingPage import BeginTrainingSidebar, BeginTrainingContent
+
+
 class App(ct.CTk):
     WIDTH = 780
     HEIGHT = 520
     RESIZABLE = False
     TITLE = "HUGRAT"
+
     def __init__(self):
         super().__init__()
         self.title(App.TITLE)
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         self.resizable(App.RESIZABLE, App.RESIZABLE)
-        self.iconbitmap("favicon.ico")
+        # self.iconbitmap("favicon.ico")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        #Takes up any extra space vertically
+        # Takes up any extra space vertically
         self.grid_rowconfigure(0, weight=1)
-        #second column(the right right) takes up any extra space horizontally
-        self.grid_columnconfigure(1,weight=1)
-        
+        # second column(the right right) takes up any extra space horizontally
+        self.grid_columnconfigure(1, weight=1)
+
         self.content = None
         self.sidebar = None
 
         self.set_page("home")
 
-    
     def on_closing(self, event=0):
         if self.content != None:
             self.content.close()
         if self.sidebar != None:
             self.sidebar.close()
         self.destroy()
-
 
     def set_page(self, page):
 
@@ -60,8 +61,8 @@ class App(ct.CTk):
             self.sidebar = CreateNewModelSidebar(master=self)
         if self.page == "new_dataset":
             self.sidebar = NewDatasetSidebar(master=self)
-            
-        #if self.page == "import_dataset":
+
+        # if self.page == "import_dataset":
         #    self.sidebar = ImportDatasetSidebar(master=self)
 
         if self.page == "begin_translation":
@@ -69,7 +70,8 @@ class App(ct.CTk):
 
         if self.page == "begin_training":
             self.sidebar = BeginTrainingSidebar(master=self)
-    def create_content(self):            
+
+    def create_content(self):
         if self.page == "home":
             self.content = HomeContent(master=self)
         if self.page == "create_new_model":
@@ -78,7 +80,7 @@ class App(ct.CTk):
             self.content = NewDatasetContent(master=self)
             self.sidebar.connect_webcam(self.content)
 
-        #if self.page == "import_dataset":
+        # if self.page == "import_dataset":
         #    self.content = ImportDatasetContent(master=self, fg_color="yellow")
 
         if self.page == "begin_translation":
@@ -86,7 +88,6 @@ class App(ct.CTk):
             self.sidebar.connect_webcam(self.content)
         if self.page == "begin_training":
             self.content = BeginTrainingContent(master=self)
-        
 
 
 if __name__ == "__main__":

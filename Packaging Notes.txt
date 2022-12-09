@@ -1,0 +1,20 @@
+Current Stage: Program is working but re-creating initial label and training_data CSVs on one
+computer but not the other.  Current build is with console for error detection.
+
+Next steps: If I can get it to stop randomly creating the files, then building with no console
+should be all that's left.
+
+Note: The file ops does not default to data folder when clicking BEGIN TRANSLATION button.
+Might consider this a "feature" where the user can save / load from their own location?
+
+
+
+pyinstaller --onedir --add-data "<PATH TO CUSTOMTKINTER>;customtkinter/" --add-data "<PATH TO MEDIAPIPE>;mediapipe/" --add-data "data/labels.csv;." --add-data "data/training_data.csv;." app.py
+
+
+
+Example (this only works on my machine)
+pyinstaller --onedir --add-data "C:\Users\zetap\anaconda3\envs\hugratenv\Lib\site-packages\customtkinter;customtkinter/" --add-data "C:\Users\zetap\anaconda3\envs\hugratenv\Lib\site-packages\mediapipe;mediapipe/" --add-data "data/labels.csv;." --add-data "data/training_data.csv;." app.py
+
+
+Icon not working yet

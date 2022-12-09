@@ -72,7 +72,7 @@ class NewDatasetSidebar(Sidebar):
             self.label_list.append(corrected_label)
             # print(self.label_list.index(corrected_label))
 
-        with open("./data/labels.csv", "w") as f:
+        with open("./labels.csv", "w") as f:
             for label in self.label_list:
                 f.write(label + "\n")
 
@@ -143,7 +143,7 @@ class NewDatasetContent(Content):
         return noise_landmark_list
 
     def logging_csv(self, label, relative_landmarks):
-        csv_path = 'data/training_data.csv'
+        csv_path = './training_data.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow(([label, *relative_landmarks]))
@@ -171,17 +171,17 @@ class NewDatasetContent(Content):
         self.grid_columnconfigure(0, weight=1)
 
         # clear training data
-        with open("./data/training_data.csv", "w") as f:
+        with open("./training_data.csv", "w") as f:
             f.write("")
         # clear labels
-        with open("./data/labels.csv", "w") as f:
+        with open("./labels.csv", "w") as f:
             f.write("")
 
         self.cap = cv.VideoCapture(0, cv.CAP_DSHOW)
 
         self.canvas = Canvas(self)
 
-        self.canvas.grid(row=0, column=0,sticky="nsew")
+        self.canvas.grid(row=0, column=0, sticky="nsew")
 
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
@@ -227,7 +227,8 @@ class NewDatasetContent(Content):
                         self.mp_drawing_styles.get_default_hand_connections_style())
 
             frame = self.frame_rgb_to_bgr(frame)
-            frame = cv.resize(frame, (self.canvas.winfo_width(), self.canvas.winfo_height()))
+            frame = cv.resize(
+                frame, (self.canvas.winfo_width(), self.canvas.winfo_height()))
             # final render
             self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
 
