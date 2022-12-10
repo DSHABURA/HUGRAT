@@ -46,7 +46,7 @@ It is recommended that the model is saved in HuGRAT\app\data\Numbers as shown ab
 
 
 
-#Using HuGRAT: Translating Gestures
+# Using HuGRAT: Translating Gestures
 From the Home screen, click the Begin Translation button.  You will see this screen:
 
 ![File_Explorer_2](Screenshots/File_Explorer_2.png)
