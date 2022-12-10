@@ -1,5 +1,6 @@
 # Where to get HuGRAT?
-The program package can currently be found at https://drive.google.com/file/d/1vhbEHol8VH8njq0G-7ADXjFdiJB_d33g/view?usp=sharing 
+The program package can currently be found at https://livemissouristate-my.sharepoint.com/:u:/g/personal/rp4487_live_missouristate_edu/Efgy1yzdDW5HnwezuTL_gaUBQdsM9nDrcCWlhCQY6lRANg?e=0qib6T 
+
 Click Download to download the zip file and save it where you would like.
 
 ![Download Icon](Screenshots/Download_Icon.png)
